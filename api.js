@@ -1,36 +1,30 @@
 import axios from "axios";
-import React, {useState, useEffect, useCallback} from 'react';
 
-export default () => {
+export const AllEmoji = async () => {
+  const response = await axios
+    .get(
+      "https://emoji-api.com/categories/travel-places?access_key=25b86a68278a7c08e0dc78cfbab7c0614d1cdbaa"
+    )
+    .catch((e) => {
+      console.log("error in AllEmoji", e);
+    });
 
-    const [result, setResult] = useState([]);
+  //   console.log("res =>", response?.data);
+  const res = response?.data || [];
+  return res.filter((val, i) => i < 100);
+};
 
-    const AllEmoji = async () => {
-            try{
-                const response = await axios.get('https://emoji-api.com/emojis?access_key=25b86a68278a7c08e0dc78cfbab7c0614d1cdbaa');
-                // setResult(response.data)
-                setResult(response.data);
-            } catch (e){
-                console.log(e);
-            }
-        };
+export const SearchEmoji = async (searchTerm) => {
+  console.log("search for this ", searchTerm);
+  const response = await axios
+    .get(
+      `https://emoji-api.com/emojis?search=${searchTerm}&access_key=25b86a68278a7c08e0dc78cfbab7c0614d1cdbaa`
+    )
+    .catch((e) => {
+      console.log("error in SearchEmoji", e);
+    });
+
     
-
-    const SearchEmoji = async (searchTerm) => {
-        try {
-
-            const response = await axios.get(`https://emoji-api.com/emojis?search=${searchTerm}&access_key=25b86a68278a7c08e0dc78cfbab7c0614d1cdbaa`);
-            console.log(response.data)
-            setResult(response.data);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    useEffect(() => { 
-        AllEmoji();
-    },[]);
-
-    return [result, SearchEmoji];
-
+  const res = response?.data || [];
+  return res.filter((val, i) => i < 100);
 };

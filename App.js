@@ -1,31 +1,50 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View , TextInput, Button, FlatList, TouchableOpacity, Pressable} from 'react-native';
-import React, {useState, useEffect} from 'react';
-import api from "./api";
+import { StatusBar } from "expo-status-bar";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  FlatList,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { AllEmoji, SearchEmoji } from "./api";
 
-export default function App() {
-
-  const [text, onChangeText] = useState('');
-  // const [result, setResult] = useState([]);
+const App = () => {
+  const [text, onChangeText] = useState("");
   const [selectedVal, setSelectedVal] = useState("1F4BB");
-  const [result, SearchEmoji] = api();
+  const [result, setResult] = useState([]);
 
-  const Search = () => {
-    SearchEmoji(text);
+  const Search = async () => {
+    setResult(await SearchEmoji(text));
   };
 
+  useEffect(() => {
+    console.log("component mounted");
+    (async () => {
+      setResult(await AllEmoji());
+      console.log('initial fetch complete')
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.search}>
         <TextInput
-            value={text}
-            onChangeText={(val) => {onChangeText(val)}}
-            style={styles.input}
-            placeholder= "Search emoji"
-            placeholderTextColor="white"
-          />
-        <Pressable style={styles.button} onPress={Search()}>
+          value={text}
+          onChangeText={(val) => onChangeText(val)}
+          style={styles.input}
+          placeholder="Search emoji"
+          placeholderTextColor="white"
+        />
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            (async () => await Search())();
+          }}
+        >
           <Text style={styles.text}>Search</Text>
         </Pressable>
       </View>
@@ -34,83 +53,87 @@ export default function App() {
           data={result}
           keyExtractor={(key) => key.unicodeName}
           numColumns={6}
-          renderItem={({item}) => {
+          renderItem={({ item }) => {
             const codepoint = item.codePoint;
             const arr = codepoint.split(" ");
-            const final = arr[0]; 
+            const final = arr[0];
             return (
               <>
                 <TouchableOpacity onPress={() => setSelectedVal(final)}>
-                  <Text style={styles.emoji_text}>{String.fromCodePoint("0x"+final)}</Text>
+                  <Text style={styles.emoji_text}>
+                    {String.fromCodePoint("0x" + final)}
+                  </Text>
                 </TouchableOpacity>
               </>
             );
           }}
-
         />
       </View>
       <StatusBar style="auto" />
       <View style={styles.component}>
-        <Text style={styles.display_emoji}>{String.fromCodePoint("0x"+selectedVal)}</Text>
+        <Text style={styles.display_emoji}>
+          {String.fromCodePoint("0x" + selectedVal)}
+        </Text>
       </View>
     </View>
-  
   );
-}
+};
+
+export default App;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#191642',
+    backgroundColor: "#191642",
     padding: 10,
-    marginTop: 50
+    marginTop: 50,
   },
-  component:{
+  component: {
     height: 500,
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center",
   },
-  emoji_picker:{
+  emoji_picker: {
     flex: 1,
     backgroundColor: "#302C66",
     borderRadius: 10,
     marginBottom: 10,
   },
-  input:{
+  input: {
     flex: 1,
     height: 50,
     backgroundColor: "#302C66",
     borderRadius: 10,
     color: "white",
     paddingHorizontal: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
-  emoji_text:{
+  emoji_text: {
     margin: 11,
-    fontSize: 28
+    fontSize: 28,
   },
-  search:{
-    flexDirection: 'row'
+  search: {
+    flexDirection: "row",
   },
-  button:{
+  button: {
     height: 50,
     marginLeft: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: "#2196F3",
   },
   text: {
     fontSize: 16,
     lineHeight: 21,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     letterSpacing: 0.25,
-    color: 'white',
+    color: "white",
   },
-  display_emoji:{
+  display_emoji: {
     fontSize: 100,
-  }
+  },
 });
